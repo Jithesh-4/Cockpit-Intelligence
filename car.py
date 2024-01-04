@@ -1,5 +1,13 @@
 import RPi.GPIO as GPIO
 import time
+import pyrebase
+import cv2
+import dlib
+import imutils
+import random
+from imutils import face_utils
+from scipy.spatial import distance as dist
+from threading import Thread
 from firebase_admin import credentials, initialize_app, db
 
 # Replace the following with your Firebase project credentials
