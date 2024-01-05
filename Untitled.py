@@ -1,4 +1,3 @@
-# python3 /home/pi/Desktop/car-iot.py
 import time
 import pyrebase
 import cv2
@@ -12,17 +11,37 @@ from threading import Thread
 
 # INPUT PINS INITIALIZATION
 GPIO.setmode(GPIO.BCM)
-motor_pin = 22
+# accelaration
 acc_pin1 = 2
 acc_pin2 = 3
 acc_pin3 = 4
+# brake pins
 brake_pin1 = 14
 brake_pin2 = 15
 brake_pin3 = 18
+# seat belt
 seatbelt_pin = 17
+# BPM
 bpm_pin = 27
+# motor
+motor_pin = 22
+# voice
+voice_pin1 = 23
+voice_pin2 = 24
+voice_pin3 = 25
+# alcohol
+alcohol_pin = 10
+# steering
+steering_pin = 9
+# left - right
+left_in_pin = 0
+right_in_pin = 5
+# headlight
+headlight_pin = 6
 
+# outputs
 GPIO.setup(motor_pin, GPIO.OUT)
+# inputs
 GPIO.setup(acc_pin1, GPIO.IN)
 GPIO.setup(acc_pin2, GPIO.IN)
 GPIO.setup(acc_pin3, GPIO.IN)
@@ -31,15 +50,27 @@ GPIO.setup(brake_pin2, GPIO.IN)
 GPIO.setup(brake_pin3, GPIO.IN)
 GPIO.setup(seatbelt_pin, GPIO.IN)
 GPIO.setup(bpm_pin, GPIO.IN)
+GPIO.setup(voice_pin1, GPIO.IN)
+GPIO.setup(voice_pin2, GPIO.IN)
+GPIO.setup(voice_pin3, GPIO.IN)
+GPIO.setup(alcohol_pin, GPIO.IN)
+GPIO.setup(steering_pin, GPIO.IN)
+GPIO.setup(left_in_pin, GPIO.IN)
+GPIO.setup(right_in_pin, GPIO.IN)
+GPIO.setup(headlight_pin, GPIO.IN)
 
-FACIAL_LANDMARK_PREDICTOR = "/home/pi/mu_code/shape_predictor_68_face_landmarks.dat"
-MINIMUM_EAR = 0.2
+#
+
+FACIAL_LANDMARK_PREDICTOR = "/home/pi/Desktop/rasberry-pi-iot-car/shape_predictor_68_face_landmarks.dat"  # path to dlib's pre-trained facial landmark predictor
+MINIMUM_EAR = 0.2    # Minimum EAR for both the eyes to mark the eyes as open
 MAXIMUM_FRAME_COUNT = 10
 
-faceDetector = dlib.get_frontal_face_detector()
-landmarkFinder = dlib.shape_predictor(FACIAL_LANDMARK_PREDICTOR)
+#Initializations
+faceDetector = dlib.get_frontal_face_detector()     # dlib's HOG based face detector
+landmarkFinder = dlib.shape_predictor(FACIAL_LANDMARK_PREDICTOR)  # dlib's landmark finder/predcitor inside detected face
 webcamFeed = cv2.VideoCapture(0)
 
+# Finding landmark id for left and right eyes
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
@@ -53,26 +84,19 @@ def eye_aspect_ratio(eye):
 EYE_CLOSED_COUNTER = 0
 
 config = {
-  "apiKey": "AIzaSyCXw8rIHYKQvDsXaK8CCm2-7L5PamYbBXQ",
-  "authDomain": "iot-car-dashboard-b5e3a.firebaseapp.com",
-  "databaseURL": "https://iot-car-dashboard-b5e3a-default-rtdb.firebaseio.com/",
-  "storageBucket": "iot-car-dashboard-b5e3a.appspot.com",
-  "projectId": "iot-car-dashboard-b5e3a",
-  "messagingSenderId": "your-messaging-sender-id",
-  "appId": "your-app-id"
+  "apiKey": "AIzaSyCWh8wa26iKZcelJXRIZ9NDO8-arjE5DCg",
+  "authDomain": "cockpit-intelligence.firebaseapp.com",
+  "databaseURL": "https://cockpit-intelligence-default-rtdb.firebaseio.com",
+  "storageBucket": "cockpit-intelligence.appspot.com"
 }
 
 firebase = pyrebase.initialize_app(config)
-db = firebase.firestore()  # Use firestore() instead of database()
+db = firebase.database()
 
-print("Send Data to Firestore Using Raspberry Pi")
+print("Send Data to Firebase Using Raspberry Pi")
 print("----------------------------------------")
 print()
 
-seatbelt = False
-bpm = 0
-acc = "low"
-brake = "low"
 
 def earCalculation():
     earCalculation.ear_val = 0
@@ -115,8 +139,21 @@ def earCalculation():
         cv2.imshow("Frame", image)
         cv2.waitKey(1)
 
+
 def parametersCalculation():
+    acc = "low"
+    brake = "low"
+    seatbelt = False
+    bpm = 0
+    voice = "idle"
+    alcohol = False
+    steering = True
+    left_in = False
+    right_in = False
+    headlight = False
+
     while True:
+    # acc calc
         if((GPIO.input(acc_pin1) == 1) and (GPIO.input(acc_pin2) == 0) and (GPIO.input(acc_pin3) == 0)):
             acc = "low"
         elif((GPIO.input(acc_pin1) == 1) and (GPIO.input(acc_pin2) == 1) and (GPIO.input(acc_pin3) == 0)):
@@ -125,7 +162,9 @@ def parametersCalculation():
             acc = "high"
         elif((GPIO.input(acc_pin1) == 0) and (GPIO.input(acc_pin2) == 0) and (GPIO.input(acc_pin3) == 0)):
             acc = "idle"
+        #print(acc)
 
+        # brake calc
         if((GPIO.input(brake_pin1) == 1) and (GPIO.input(brake_pin2) == 0) and (GPIO.input(brake_pin3) == 0)):
             brake = "low"
         elif((GPIO.input(brake_pin1) == 1) and (GPIO.input(brake_pin2) == 1) and (GPIO.input(brake_pin3) == 0)):
@@ -135,31 +174,79 @@ def parametersCalculation():
         elif((GPIO.input(brake_pin1) == 0) and (GPIO.input(brake_pin2) == 0) and (GPIO.input(brake_pin3) == 0)):
             brake = "idle"
 
-        if(GPIO.input(seatbelt_pin) == 0):
+        # seatbelt calc
+        if(GPIO.input(seatbelt_pin) == 1):
             seatbelt = True
             GPIO.output(motor_pin, False)
-        elif(GPIO.input(seatbelt_pin) == 1):
+        elif(GPIO.input(seatbelt_pin) == 0):
             seatbelt = False
             GPIO.output(motor_pin, True)
 
-        if(GPIO.input(bpm_pin) == 0):
-            bpm = random.randint(72, 81)
-        elif(GPIO.input(bpm_pin) == 1):
+        # bpm calc
+        if(GPIO.input(bpm_pin) == 1):
+            bpm = random.randint(72,81)
+        elif(GPIO.input(bpm_pin) == 0):
             bpm = 0
+
+        # voice calc
+        if((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 0) and (GPIO.input(voice_pin3) == 0)):
+            voice = "red"
+        elif((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 1) and (GPIO.input(voice_pin3) == 0)):
+            voice = "blue"
+        elif((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 1) and (GPIO.input(voice_pin3) == 1)):
+            voice = "green"
+        elif((GPIO.input(voice_pin1) == 0) and (GPIO.input(voice_pin2) == 0) and (GPIO.input(voice_pin3) == 0)):
+            voice = "idle"
+
+        # alcohol calc
+        if(GPIO.input(alcohol_pin) == 1):
+            alcohol = False
+        elif(GPIO.input(alcohol_pin) == 0):
+            alcohol = True
+
+        # steering calc
+        if(GPIO.input(steering_pin) == 1):
+            steering = True
+        elif(GPIO.input(steering_pin) == 0):
+            steering = False
+
+        # left-in calc
+        if(GPIO.input(left_in_pin) == 1):
+            left_in = False
+        elif(GPIO.input(left_in_pin) == 0):
+            left_in = True
+
+        # right-in calc
+        if(GPIO.input(right_in_pin) == 1):
+            right_in = False
+        elif(GPIO.input(right_in_pin) == 0):
+            right_in = True
+
+        # headlight calc
+        if(GPIO.input(headlight_pin) == 1):
+            headlight = False
+        elif(GPIO.input(headlight_pin) == 0):
+            headlight = True
 
         data = {
             "ear": earCalculation.ear_val,
-            "seatbelt": seatbelt,
-            "bpm" : bpm,
             "acceleration" : acc,
             "brake" : brake,
+            "seatbelt": seatbelt,
+            "bpm" : bpm,
+            "voice" : voice,
+            "alcohol" : alcohol,
+            "steering" : steering,
+            "left_in" : left_in,
+            "right_in" : right_in,
+            "headlight" : headlight
         }
 
         print(data)
 
-        db.collection("sensor-values").add(data)
+        db.child("sensor-values").set(data)
         time.sleep(2)
 
 if _name_ == '_main_':
-    Thread(target=earCalculation).start()
-    Thread(target=parametersCalculation).start()
+    Thread(target = earCalculation).start()
+    Thread(target = parametersCalculation).start()
