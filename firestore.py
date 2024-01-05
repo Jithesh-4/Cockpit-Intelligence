@@ -7,8 +7,6 @@ import imutils
 import random
 from imutils import face_utils
 from scipy.spatial import distance as dist
-import RPi.GPIO as GPIO
-from threading import Thread
 from threading import Thread
 from firebase_admin import credentials, initialize_app, db
 
@@ -91,7 +89,7 @@ EYE_CLOSED_COUNTER = 0
 
 cred = credentials.Certificate("/home/pi/Desktop/Cockpit-Intelligence/cockpit-intelligence-firebase-adminsdk-a7ryd-509f7a433c.json")
 firebase_app = initialize_app(cred, {"databaseURL": "https://cockpit-intelligence-default-rtdb.firebaseio.com/"})
-ref = db.reference("/")
+db = db.reference("/")
 
 
 print("Send Data to Firebase Using Raspberry Pi")
@@ -243,6 +241,6 @@ def parametersCalculation():
         db.child("headlight").set(headlight)
         time.sleep(2)
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     Thread(target = earCalculation).start()
     Thread(target = parametersCalculation).start()
