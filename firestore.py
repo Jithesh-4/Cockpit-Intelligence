@@ -23,9 +23,29 @@ acc_pin3 = 4
 brake_pin1 = 14
 brake_pin2 = 15
 brake_pin3 = 18
+# seat belt
+seatbelt_pin = 17
+# BPM
+bpm_pin = 27
+# motor
+motor_pin = 22
+# voice
+voice_pin1 = 23
+voice_pin2 = 24
+voice_pin3 = 25
+# alcohol
+alcohol_pin = 10
+# steering
+steering_pin = 9
+# left - right
+left_in_pin = 0
+right_in_pin = 5
+# headlight
+headlight_pin = 6
 
 
-
+# outputs
+GPIO.setup(motor_pin, GPIO.OUT)
 # inputs
 GPIO.setup(acc_pin1, GPIO.IN)
 GPIO.setup(acc_pin2, GPIO.IN)
@@ -33,6 +53,16 @@ GPIO.setup(acc_pin3, GPIO.IN)
 GPIO.setup(brake_pin1, GPIO.IN)
 GPIO.setup(brake_pin2, GPIO.IN)
 GPIO.setup(brake_pin3, GPIO.IN)
+GPIO.setup(seatbelt_pin, GPIO.IN)
+GPIO.setup(bpm_pin, GPIO.IN)
+GPIO.setup(voice_pin1, GPIO.IN)
+GPIO.setup(voice_pin2, GPIO.IN)
+GPIO.setup(voice_pin3, GPIO.IN)
+GPIO.setup(alcohol_pin, GPIO.IN)
+GPIO.setup(steering_pin, GPIO.IN)
+GPIO.setup(left_in_pin, GPIO.IN)
+GPIO.setup(right_in_pin, GPIO.IN)
+GPIO.setup(headlight_pin, GPIO.IN)
 
 #
 FACIAL_LANDMARK_PREDICTOR = "/home/pi/Desktop/Cockpit-Intelligence/shape_predictor_68_face_landmarks.dat"  # path to dlib's pre-trained facial landmark predictor
@@ -114,9 +144,17 @@ def earCalculation():
 def parametersCalculation():
     acc = "low"
     brake = "low"
+    seatbelt = False
+    bpm = 0
+    voice = "idle"
+    alcohol = False
+    steering = True
+    left_in = False
+    right_in = False
+    headlight = False
 
     while True:
-        # acc calc
+    # acc calc
         if((GPIO.input(acc_pin1) == 1) and (GPIO.input(acc_pin2) == 0) and (GPIO.input(acc_pin3) == 0)):
             acc = "low"
         elif((GPIO.input(acc_pin1) == 1) and (GPIO.input(acc_pin2) == 1) and (GPIO.input(acc_pin3) == 0)):
@@ -137,18 +175,74 @@ def parametersCalculation():
         elif((GPIO.input(brake_pin1) == 0) and (GPIO.input(brake_pin2) == 0) and (GPIO.input(brake_pin3) == 0)):
             brake = "idle"
 
+        # seatbelt calc
+        if(GPIO.input(seatbelt_pin) == 1):
+            seatbelt = True
+            GPIO.output(motor_pin, False)
+        elif(GPIO.input(seatbelt_pin) == 0):
+            seatbelt = False
+            GPIO.output(motor_pin, True)
 
-        data = {
-            "acceleration" : acc,
-            "brake" : brake,
-        
-        }
+        # bpm calc
+        if(GPIO.input(bpm_pin) == 1):
+            bpm = random.randint(72,81)
+        elif(GPIO.input(bpm_pin) == 0):
+            bpm = 0
 
-        print(data)
+        # voice calc
+        if((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 0) and (GPIO.input(voice_pin3) == 0)):
+            voice = "red"
+        elif((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 1) and (GPIO.input(voice_pin3) == 0)):
+            voice = "blue"
+        elif((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 1) and (GPIO.input(voice_pin3) == 1)):
+            voice = "green"
+        elif((GPIO.input(voice_pin1) == 0) and (GPIO.input(voice_pin2) == 0) and (GPIO.input(voice_pin3) == 0)):
+            voice = "idle"
 
-        db.child("sensor-values").set(data)
+        # alcohol calc
+        if(GPIO.input(alcohol_pin) == 1):
+            alcohol = False
+        elif(GPIO.input(alcohol_pin) == 0):
+            alcohol = True
+
+        # steering calc
+        if(GPIO.input(steering_pin) == 1):
+            steering = True
+        elif(GPIO.input(steering_pin) == 0):
+            steering = False
+
+        # left-in calc
+        if(GPIO.input(left_in_pin) == 1):
+            left_in = False
+        elif(GPIO.input(left_in_pin) == 0):
+            left_in = True
+
+        # right-in calc
+        if(GPIO.input(right_in_pin) == 1):
+            right_in = False
+        elif(GPIO.input(right_in_pin) == 0):
+            right_in = True
+
+        # headlight calc
+        if(GPIO.input(headlight_pin) == 1):
+            headlight = False
+        elif(GPIO.input(headlight_pin) == 0):
+            headlight = True
+
+
+
+        db.child("ear").set(earCalculation.ear_val)
+        db.child("acceleration").set(acc)
+        db.child("brake").set(brake)
+        db.child("seatbelt").set(seatbelt)
+        db.child("bpm").set(bpm)
+        db.child("voice").set(voice)
+        db.child("steering").set(steering)
+        db.child("left_in").set(left_in)
+        db.child("right_in").set(right_in)
+        db.child("headlight").set(headlight)
         time.sleep(2)
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     Thread(target = earCalculation).start()
     Thread(target = parametersCalculation).start()
