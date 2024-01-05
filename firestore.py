@@ -35,7 +35,7 @@ GPIO.setup(brake_pin2, GPIO.IN)
 GPIO.setup(brake_pin3, GPIO.IN)
 
 #
-FACIAL_LANDMARK_PREDICTOR = "/home/pi/Desktop/rasberry-pi-iot-car/shape_predictor_68_face_landmarks.dat"  # path to dlib's pre-trained facial landmark predictor
+FACIAL_LANDMARK_PREDICTOR = "/home/pi/Desktop/Cockpit-Intelligence/shape_predictor_68_face_landmarks.dat"  # path to dlib's pre-trained facial landmark predictor
 MINIMUM_EAR = 0.2    # Minimum EAR for both the eyes to mark the eyes as open
 MAXIMUM_FRAME_COUNT = 10
 
@@ -59,7 +59,7 @@ EYE_CLOSED_COUNTER = 0
 
 
 
-cred = credentials.Certificate("/home/pi/Desktop/pmain/predictive-maintainence-1841d-firebase-adminsdk-oejc1-37178fae8b.json")
+cred = credentials.Certificate("/home/pi/Desktop/Cockpit-Intelligence/cockpit-intelligence-firebase-adminsdk-a7ryd-509f7a433c.json")
 firebase_app = initialize_app(cred, {"databaseURL": "https://cockpit-intelligence-default-rtdb.firebaseio.com/"})
 ref = db.reference("/")
 
@@ -149,6 +149,6 @@ def parametersCalculation():
         db.child("sensor-values").set(data)
         time.sleep(2)
 
-"""if _name_ == '_main_':
+if __name__ == '__main__':
     Thread(target = earCalculation).start()
-    Thread(target = parametersCalculation).start()"""
+    Thread(target = parametersCalculation).start()
