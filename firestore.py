@@ -1,7 +1,8 @@
 import time
-import pyrebase
+#import pyrebase
 import RPi.GPIO as GPIO
 from threading import Thread
+from firebase_admin import credentials, initialize_app, db
 
 
 # INPUT PINS INITIALIZATION
@@ -27,15 +28,10 @@ GPIO.setup(brake_pin3, GPIO.IN)
 
 
 
-config = {
-  "apiKey": "AIzaSyCWh8wa26iKZcelJXRIZ9NDO8-arjE5DCg",
-  "authDomain": "cockpit-intelligence.firebaseapp.com",
-  "databaseURL": "https://cockpit-intelligence-default-rtdb.firebaseio.com",
-  "storageBucket": "cockpit-intelligence.appspot.com"
-}
+cred = credentials.Certificate("/home/pi/Desktop/pmain/predictive-maintainence-1841d-firebase-adminsdk-oejc1-37178fae8b.json")
+firebase_app = initialize_app(cred, {"databaseURL": "https://cockpit-intelligence-default-rtdb.firebaseio.com/"})
+ref = db.reference("/")
 
-firebase = pyrebase.initialize_app(config)
-db = firebase.database()
 
 print("Send Data to Firebase Using Raspberry Pi")
 print("----------------------------------------")
@@ -80,6 +76,3 @@ def parametersCalculation():
 
         db.child("sensor-values").set(data)
         time.sleep(2)
-
-if _name_ == '_main_':
-    Thread(target = parametersCalculation).start()
