@@ -10,14 +10,9 @@ firebase_admin.initialize_app(cred, {
 
 ref = db.reference('path/to/store_data')  # Replace with your desired storage path
 
-# Simulating multiple data uploads with a delay
-for i in range(5):  # Change the number of iterations as needed
-    data_to_upload = {
-        'sensor_reading': 25.5 + i,  # Replace this with your sensor reading or any data
-        'delay': f"{i} seconds delay"  # Adding a delay indicator in the data
-    }
+data_to_upload = {
+    'sensor_reading': 25.5,  # Replace this with your sensor reading
+    'timestamp': '2024-01-10 12:00:00'  # Replace with your timestamp or any other relevant data
+}
 
-    ref.push(data_to_upload)
-    
-    # Introduce a delay between uploads
-    time.sleep(5)  # Change the delay duration (in seconds) as needed
+ref.push(data_to_upload)
