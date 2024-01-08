@@ -310,6 +310,6 @@ def parametersCalculation():
         ref.child("horn").set(horn)
         time.sleep(1)
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     Thread(target = earCalculation).start()
     Thread(target = parametersCalculation).start()
