@@ -23,12 +23,6 @@ brake_pin2 = 18
 seatbelt_pin = 17
 # BPM
 bpm_pin = 27
-# motor
-motor_pin = 22
-# voice
-voice_pin1 = 23
-voice_pin2 = 24
-voice_pin3 = 25
 # steering
 steering_pin = 9
 # left - right - in
@@ -66,10 +60,6 @@ GPIO.setup(acc_pin2, GPIO.IN)
 GPIO.setup(brake_pin1, GPIO.IN)
 GPIO.setup(brake_pin2, GPIO.IN)
 GPIO.setup(seatbelt_pin, GPIO.IN)
-GPIO.setup(bpm_pin, GPIO.IN)
-GPIO.setup(voice_pin1, GPIO.IN)
-GPIO.setup(voice_pin2, GPIO.IN)
-GPIO.setup(voice_pin3, GPIO.IN)
 GPIO.setup(steering_pin, GPIO.IN)
 GPIO.setup(left_in_pin, GPIO.IN)
 GPIO.setup(right_in_pin, GPIO.IN)
@@ -162,8 +152,6 @@ def parametersCalculation():
     acc = "low"
     brake = "low"
     seatbelt = False
-    bpm = 0
-    voice = "idle"
     steering = False
     left_in = False
     right_in = False
@@ -174,7 +162,7 @@ def parametersCalculation():
     horn = "low"
 
     while True:
-    # acc calc
+        # acc calc
         if((GPIO.input(acc_pin1) == 0) and (GPIO.input(acc_pin2) == 1)):
             acc = "low"
         elif((GPIO.input(acc_pin1) == 1) and (GPIO.input(acc_pin2) == 0)):
@@ -183,7 +171,6 @@ def parametersCalculation():
             acc = "high"
         elif((GPIO.input(acc_pin1) == 0) and (GPIO.input(acc_pin2) == 0)):
             acc = "idle"
-        #print(acc)
 
         # brake calc
         if((GPIO.input(brake_pin1) == 0) and (GPIO.input(brake_pin2) == 1)):
@@ -200,22 +187,6 @@ def parametersCalculation():
             seatbelt = True
         elif(GPIO.input(seatbelt_pin) == 0):
             seatbelt = False
-
-        # bpm calc
-        if(GPIO.input(bpm_pin) == 1):
-            bpm = random.randint(72,81)
-        elif(GPIO.input(bpm_pin) == 0):
-            bpm = 0
-
-        # voice calc
-        if((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 0) and (GPIO.input(voice_pin3) == 0)):
-            voice = "red"
-        elif((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 1) and (GPIO.input(voice_pin3) == 0)):
-            voice = "blue"
-        elif((GPIO.input(voice_pin1) == 1) and (GPIO.input(voice_pin2) == 1) and (GPIO.input(voice_pin3) == 1)):
-            voice = "green"
-        elif((GPIO.input(voice_pin1) == 0) and (GPIO.input(voice_pin2) == 0) and (GPIO.input(voice_pin3) == 0)):
-            voice = "idle"
 
         # steering calc
         if(GPIO.input(steering_pin) == 1):
@@ -269,7 +240,7 @@ def parametersCalculation():
         elif(GPIO.input(horn_pin) == 0):
             horn = False
         
-        '''# beep out
+        # beep out
         if(GPIO.input(horn_pin) == 1):
             GPIO.output(beep_out_pin, GPIO.HIGH)
         elif(GPIO.input(horn_pin) == 0):
@@ -291,7 +262,7 @@ def parametersCalculation():
         if(GPIO.input(right_in_pin) == 1):
             GPIO.output(right_out_pin, GPIO.HIGH)
         elif(GPIO.input(right_in_pin) == 0):
-            GPIO.output(right_out_pin, GPIO.LOW)'''
+            GPIO.output(right_out_pin, GPIO.LOW)
 
 
         ref.child("ear").set(earCalculation.ear_val)
