@@ -7,7 +7,7 @@ import imutils
 import random
 from imutils import face_utils
 from scipy.spatial import distance as dist
-import threading
+from threading import Thread
 from firebase_admin import credentials, initialize_app, db
 
 
@@ -106,7 +106,7 @@ EYE_CLOSED_COUNTER = 0
 
 
 
-cred = credentials.Certificate("/home/pi/Desktop/Cockpit-Intelligence/cockpit-intelligence-firebase-adminsdk-a7ryd-509f7a433c.json")
+cred = credentials.Certificate("/home/pi/Desktop/Cockpit-Intelligence/cockpit-intelligence-firebase-adminsdk-a7ryd-7da4f325ef.json")
 firebase_app = initialize_app(cred, {"databaseURL": "https://cockpit-intelligence-default-rtdb.firebaseio.com/"})
 ref = db.reference("/")
 
@@ -269,7 +269,7 @@ def parametersCalculation():
         elif(GPIO.input(horn_pin) == 0):
             horn = False
         
-        # beep out
+        '''# beep out
         if(GPIO.input(horn_pin) == 1):
             GPIO.output(beep_out_pin, GPIO.HIGH)
         elif(GPIO.input(horn_pin) == 0):
@@ -291,7 +291,7 @@ def parametersCalculation():
         if(GPIO.input(right_in_pin) == 1):
             GPIO.output(right_out_pin, GPIO.HIGH)
         elif(GPIO.input(right_in_pin) == 0):
-            GPIO.output(right_out_pin, GPIO.LOW)
+            GPIO.output(right_out_pin, GPIO.LOW)'''
 
 
         ref.child("ear").set(earCalculation.ear_val)
@@ -310,17 +310,9 @@ def parametersCalculation():
         ref.child("horn").set(horn)
         time.sleep(1)
 
-if _name_ == "_main_":
-    # Create threads
-    thread1 = threading.Thread(target=earCalculation)
-    thread2 = threading.Thread(target=parametersCalculation)
 
-    # Start threads
-    thread1.start()
-    thread2.start()
 
-    # Wait for both threads to finish
-    thread1.join()
-    thread2.join()
-
-    print("Main thread exiting")
+if __name__ == '__main__':
+    Thread(target = earCalculation).start()
+    Thread(target = parametersCalculation).start()
+    
