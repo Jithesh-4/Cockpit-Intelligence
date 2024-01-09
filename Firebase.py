@@ -265,7 +265,7 @@ def parametersCalculation():
             GPIO.output(right_out_pin, GPIO.LOW)
 
 
-        ref.child("ear").set(earCalculation.ear_val)
+        '''ref.child("ear").set(earCalculation.ear_val)
         ref.child("acceleration").set(acc)
         ref.child("brake").set(brake)
         ref.child("seatbelt").set(seatbelt)
@@ -277,12 +277,25 @@ def parametersCalculation():
         ref.child("cornering").set(cornering)
         ref.child("sudden break").set(sudden_break)
         ref.child("horn").set(horn)
-        time.sleep(1)
+        time.sleep(1)'''
 
+        data={
+      "ear":earCalculation.ear_val,
+      "acceleration":acc,
+      "brake":brake,
+      "seatbelt":seatbelt,
+      "steering":steering,
+      "left_in":left_in,
+      "right_in":right_in,
+      "headlight":headlightin,
+      "gear":gear,
+      "cornering":cornering,
+      "sudden break":sudden_break,
+      "horn":horn
+        }
+        print(data)
+        ref.child("sensorvalues").set(data)
 
-
-if __name__ == '__main__':
-    Thread(target = earCalculation).start()
-    Thread(target = parametersCalculation).start()
-    time.sleep(1)
-    
+if _name_ == '_main_':
+    earCalculation()
+    parametersCalculation()
