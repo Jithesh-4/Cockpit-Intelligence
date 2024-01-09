@@ -269,8 +269,6 @@ def parametersCalculation():
         ref.child("acceleration").set(acc)
         ref.child("brake").set(brake)
         ref.child("seatbelt").set(seatbelt)
-        ref.child("bpm").set(bpm)
-        ref.child("voice").set(voice)
         ref.child("steering").set(steering)
         ref.child("left_in").set(left_in)
         ref.child("right_in").set(right_in)
@@ -286,4 +284,5 @@ def parametersCalculation():
 if __name__ == '__main__':
     Thread(target = earCalculation).start()
     Thread(target = parametersCalculation).start()
+    time.sleep(1)
     
