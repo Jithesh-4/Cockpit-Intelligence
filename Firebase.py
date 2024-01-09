@@ -294,8 +294,10 @@ def parametersCalculation():
       "horn":horn
         }
         print(data)
-        ref.child("sensorvalues").set(data)
+        ref.set(data)
 
-if _name_ == '_main_':
-    earCalculation()
-    parametersCalculation()
+
+if __name__ == '__main__':
+    Thread(target = earCalculation).start()
+    Thread(target = parametersCalculation).start()
+    
