@@ -7,7 +7,7 @@ import imutils
 import random
 from imutils import face_utils
 from scipy.spatial import distance as dist
-from threading import Thread
+import threading
 from firebase_admin import credentials, initialize_app, db
 
 
@@ -310,6 +310,17 @@ def parametersCalculation():
         ref.child("horn").set(horn)
         time.sleep(1)
 
-if _name_ == '_main_':
-    Thread(target = earCalculation).start()
-    Thread(target = parametersCalculation).start()
+if _name_ == "_main_":
+    # Create threads
+    thread1 = threading.Thread(target=earCalculation)
+    thread2 = threading.Thread(target=parametersCalculation)
+
+    # Start threads
+    thread1.start()
+    thread2.start()
+
+    # Wait for both threads to finish
+    thread1.join()
+    thread2.join()
+
+    print("Main thread exiting")
