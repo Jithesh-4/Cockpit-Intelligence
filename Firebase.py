@@ -190,9 +190,9 @@ def parametersCalculation():
 
         # steering calc
         if(GPIO.input(steering_pin) == 1):
-            steering = 1
-        elif(GPIO.input(steering_pin) == 0):
             steering = 0
+        elif(GPIO.input(steering_pin) == 0):
+            steering = 1
 
         # left-in calc
         if(GPIO.input(left_in_pin) == 0):
