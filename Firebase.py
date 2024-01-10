@@ -184,9 +184,9 @@ def parametersCalculation():
 
         # seatbelt calc
         if(GPIO.input(seatbelt_pin) == 0):
-            seatbelt = 0
-        elif(GPIO.input(seatbelt_pin) == 1):
             seatbelt = 1
+        elif(GPIO.input(seatbelt_pin) == 1):
+            seatbelt = 0
 
         # steering calc
         if(GPIO.input(steering_pin) == 1):
