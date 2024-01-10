@@ -214,11 +214,11 @@ def parametersCalculation():
 
         # gear calc
         if((GPIO.input(gear_pin1) == 0) and (GPIO.input(gear_pin2) == 1)):
-            gear = 1
+            gear+=1
         elif((GPIO.input(gear_pin1) == 1) and (GPIO.input(gear_pin2) == 0)):
-            gear = 2
-        elif((GPIO.input(gear_pin1) == 0) and (GPIO.input(gear_pin2) == 0)):
-            gear = 0
+            gear-=1
+        if(gear<0):
+            gear=0
 
         # cornering calc
         if((GPIO.input(cornering_pin1) == 0) and (GPIO.input(cornering_pin2) == 1)):
@@ -247,21 +247,21 @@ def parametersCalculation():
             GPIO.output(beep_out_pin, GPIO.LOW)
         
         # headlight out
-        if(GPIO.input(headlight_in_pin) == 1):
+        if(GPIO.input(headlight_in_pin) == 0):
             GPIO.output(headlight_out_pin, GPIO.HIGH)
-        elif(GPIO.input(headlight_in_pin) == 0):
+        elif(GPIO.input(headlight_in_pin) == 1):
             GPIO.output(headlight_out_pin, GPIO.LOW)
         
         # left-in calc
-        if(GPIO.input(left_in_pin) == 1):
+        if(GPIO.input(left_in_pin) == 0):
             GPIO.output(left_out_pin, GPIO.HIGH)
-        elif(GPIO.input(left_in_pin) == 0):
+        elif(GPIO.input(left_in_pin) == 1):
             GPIO.output(left_out_pin, GPIO.LOW)
 
         # right-in calc
-        if(GPIO.input(right_in_pin) == 1):
+        if(GPIO.input(right_in_pin) == 0):
             GPIO.output(right_out_pin, GPIO.HIGH)
-        elif(GPIO.input(right_in_pin) == 0):
+        elif(GPIO.input(right_in_pin) == 1):
             GPIO.output(right_out_pin, GPIO.LOW)
 
 
@@ -286,4 +286,3 @@ def parametersCalculation():
 if __name__ == '__main__':
     Thread(target = earCalculation).start()
     Thread(target = parametersCalculation).start()
-    
