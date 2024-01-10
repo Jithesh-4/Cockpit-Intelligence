@@ -149,96 +149,96 @@ def earCalculation():
 
 
 def parametersCalculation():
-    acc = "low"
-    brake = "low"
-    seatbelt = False
-    steering = False
-    left_in = False
-    right_in = False
-    headlightin = False
-    gear = "idle"
-    cornering = "idle"
-    sudden_break = "low"
-    horn = "low"
+    acc = 0
+    brake = 0
+    seatbelt = 0
+    steering = 0
+    left_in = 0
+    right_in = 0
+    headlightin = 0
+    gear = 0
+    cornering = 0
+    sudden_break = 0
+    horn = 0
 
     while True:
         # acc calc
         if((GPIO.input(acc_pin1) == 0) and (GPIO.input(acc_pin2) == 1)):
-            acc = "low"
+            acc = 1
         elif((GPIO.input(acc_pin1) == 1) and (GPIO.input(acc_pin2) == 0)):
-            acc = "med"
+            acc = 2
         elif((GPIO.input(acc_pin1) == 1) and (GPIO.input(acc_pin2) == 1)):
-            acc = "high"
+            acc = 3
         elif((GPIO.input(acc_pin1) == 0) and (GPIO.input(acc_pin2) == 0)):
-            acc = "idle"
+            acc = 0
 
         # brake calc
         if((GPIO.input(brake_pin1) == 0) and (GPIO.input(brake_pin2) == 1)):
-            brake = "low"
+            brake = 1
         elif((GPIO.input(brake_pin1) == 1) and (GPIO.input(brake_pin2) == 0)):
-            brake = "med"
+            brake = 2
         elif((GPIO.input(brake_pin1) == 1) and (GPIO.input(brake_pin2) == 1)):
-            brake = "high"
+            brake = 3
         elif((GPIO.input(brake_pin1) == 0) and (GPIO.input(brake_pin2) == 0)):
-            brake = "idle"
+            brake = 0
 
         # seatbelt calc
-        if(GPIO.input(seatbelt_pin) == 1):
-            seatbelt = True
-        elif(GPIO.input(seatbelt_pin) == 0):
-            seatbelt = False
+        if(GPIO.input(seatbelt_pin) == 0):
+            seatbelt = 0
+        elif(GPIO.input(seatbelt_pin) == 1):
+            seatbelt = 1
 
         # steering calc
         if(GPIO.input(steering_pin) == 1):
-            steering = True
+            steering = 1
         elif(GPIO.input(steering_pin) == 0):
-            steering = False
+            steering = 0
 
         # left-in calc
         if(GPIO.input(left_in_pin) == 0):
-            left_in = False
+            left_in = 0
         elif(GPIO.input(left_in_pin) == 1):
-            left_in = True
+            left_in = 1
 
         # right-in calc
         if(GPIO.input(right_in_pin) == 0):
-            right_in = False
+            right_in = 0
         elif(GPIO.input(right_in_pin) == 1):
-            right_in = True
+            right_in = 1
 
         # headlight in calc
         if(GPIO.input(headlight_in_pin) == 1):
-            headlightin = True
+            headlightin = 1
         elif(GPIO.input(headlight_in_pin) == 0):
-            headlightin = False
+            headlightin = 0
 
         # gear calc
         if((GPIO.input(gear_pin1) == 0) and (GPIO.input(gear_pin2) == 1)):
-            gear = "low"
+            gear = 1
         elif((GPIO.input(gear_pin1) == 1) and (GPIO.input(gear_pin2) == 0)):
-            gear = "high"
+            gear = 2
         elif((GPIO.input(gear_pin1) == 0) and (GPIO.input(gear_pin2) == 0)):
-            gear = "idle"
+            gear = 0
 
         # cornering calc
         if((GPIO.input(cornering_pin1) == 0) and (GPIO.input(cornering_pin2) == 1)):
-            cornering = "low"
+            cornering = 1
         elif((GPIO.input(cornering_pin1) == 1) and (GPIO.input(cornering_pin2) == 0)):
-            cornering = "high"
+            cornering = 2
         elif((GPIO.input(cornering_pin1) == 0) and (GPIO.input(cornering_pin2) == 0)):
-            cornering = "idle"
+            cornering = 0
         
-        # seatbelt calc
+        # sudden break calc
         if(GPIO.input(sudden_break_pin) == 1):
-            sudden_break = True
+            sudden_break = 1
         elif(GPIO.input(sudden_break_pin) == 0):
-            sudden_break = False
+            sudden_break = 0
         
         # horn calc
         if(GPIO.input(horn_pin) == 1):
-            horn = True
+            horn = 1
         elif(GPIO.input(horn_pin) == 0):
-            horn = False
+            horn = 0
         
         # beep out
         if(GPIO.input(horn_pin) == 1):
@@ -264,20 +264,6 @@ def parametersCalculation():
         elif(GPIO.input(right_in_pin) == 0):
             GPIO.output(right_out_pin, GPIO.LOW)
 
-
-        '''ref.child("ear").set(earCalculation.ear_val)
-        ref.child("acceleration").set(acc)
-        ref.child("brake").set(brake)
-        ref.child("seatbelt").set(seatbelt)
-        ref.child("steering").set(steering)
-        ref.child("left_in").set(left_in)
-        ref.child("right_in").set(right_in)
-        ref.child("headlight").set(headlightin)
-        ref.child("gear").set(gear)
-        ref.child("cornering").set(cornering)
-        ref.child("sudden break").set(sudden_break)
-        ref.child("horn").set(horn)
-        time.sleep(1)'''
 
         data={
       "ear":earCalculation.ear_val,
