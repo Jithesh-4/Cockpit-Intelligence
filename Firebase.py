@@ -214,12 +214,15 @@ def parametersCalculation():
 
         # gear calc
         if((GPIO.input(gear_pin1) == 0) and (GPIO.input(gear_pin2) == 1)):
+            time.sleep(.250)
             gear+=1
         elif((GPIO.input(gear_pin1) == 1) and (GPIO.input(gear_pin2) == 0)):
+            time.sleep(.250)
             gear-=1
         if(gear<0):
             gear=0
-
+        if(gear>5):
+            gear=5
         # cornering calc
         if((GPIO.input(cornering_pin1) == 0) and (GPIO.input(cornering_pin2) == 1)):
             cornering = 1
