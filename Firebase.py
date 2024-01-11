@@ -108,7 +108,7 @@ print()
 
 def earCalculation():
     earCalculation.ear_val = 0
-    earCalculation.distraction = False
+    earCalculation.distraction = 0
     while True:
         (status, image) = webcamFeed.read()
         image = imutils.resize(image, width=800)
