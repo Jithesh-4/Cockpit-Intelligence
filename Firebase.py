@@ -108,12 +108,20 @@ print()
 
 def earCalculation():
     earCalculation.ear_val = 0
+    earCalculation.distraction = False
     while True:
         (status, image) = webcamFeed.read()
         image = imutils.resize(image, width=800)
         grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         faces = faceDetector(grayImage, 0)
+
+        if len(faces) == 0:
+            earCalculation.distraction = 1
+            dis =  "detected"
+        else:
+            earCalculation.distraction = 0
+            dis =  "not detected"
 
         for face in faces:
             faceLandmarks = landmarkFinder(grayImage, face)
@@ -139,10 +147,11 @@ def earCalculation():
             else:
                 EYE_CLOSED_COUNTER = 0
 
-            cv2.putText(image, "EAR: {}".format(round(ear, 1)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(image, "EAR: {}".format(round(ear, 1)), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(image, "Distraction: {}".str(dis), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
             if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
-                cv2.putText(image, "Drowsiness", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(image, "Drowsiness", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         cv2.imshow("Frame", image)
         cv2.waitKey(1)
@@ -255,13 +264,8 @@ def parametersCalculation():
         elif(GPIO.input(horn_pin) == 0):
             GPIO.output(beep_out_pin, GPIO.LOW)
         
-        '''# headlight out
-        if(GPIO.input(headlight_in_pin) == 0):
-            GPIO.output(headlight_out_pin, GPIO.HIGH)
-        elif(GPIO.input(headlight_in_pin) == 1):
-            GPIO.output(headlight_out_pin, GPIO.LOW)'''
         
-         # headlight in calc
+         # headlight out calc
         if(GPIO.input(headlight_in_pin) == 1):
             if(headlightin==0):
                 GPIO.output(headlight_out_pin, GPIO.HIGH)
@@ -270,20 +274,23 @@ def parametersCalculation():
                 
         
         # left-out calc
-        if(GPIO.input(left_in_pin) == 0):
-            GPIO.output(left_out_pin, GPIO.HIGH)
-        elif(GPIO.input(left_in_pin) == 1):
+        if(GPIO.input(left_in_pin) == 1):
+            if(left_in==0):
+                GPIO.output(left_out_pin, GPIO.HIGH)
+        else:
             GPIO.output(left_out_pin, GPIO.LOW)
 
-        # right-out calc
-        if(GPIO.input(right_in_pin) == 0):
-            GPIO.output(right_out_pin, GPIO.HIGH)
-        elif(GPIO.input(right_in_pin) == 1):
-            GPIO.output(right_out_pin, GPIO.LOW)
 
+        # right-out calc
+        if(GPIO.input(right_in_pin) == 1):
+            if(right_in==0):
+                GPIO.output(right_in_pin, GPIO.HIGH)
+        else:
+            GPIO.output(right_in_pin, GPIO.LOW)
 
         data={
       "ear":earCalculation.ear_val,
+      "distraction":earCalculation.distraction,
       "acceleration":acc,
       "brake":brake,
       "seatbelt":seatbelt,
