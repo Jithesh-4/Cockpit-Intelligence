@@ -289,7 +289,7 @@ def parametersCalculation():
       "horn":horn
         }
         print(data)
-        ref.set(data)
+        ref.child("rpi_sensors").set(data)
 
 
 if __name__ == '__main__':
