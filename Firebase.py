@@ -8628,22 +8628,16 @@ def parametersCalculation():
             steering = 1
 
         # left-in calc
-        if(GPIO.input(left_in_pin) == 0):
-            left_in = 0
-        elif(GPIO.input(left_in_pin) == 1):
-            left_in = 1
+        if(GPIO.input(left_in_pin) == 1):
+            left_in = ~left_in
 
         # right-in calc
-        if(GPIO.input(right_in_pin) == 0):
-            right_in = 0
-        elif(GPIO.input(right_in_pin) == 1):
-            right_in = 1
+        if(GPIO.input(right_in_pin) == 1):
+            right_in = ~right_in
 
         # headlight in calc
         if(GPIO.input(headlight_in_pin) == 1):
-            headlightin = 1
-        elif(GPIO.input(headlight_in_pin) == 0):
-            headlightin = 0
+            headlightin = ~headlightin
 
         # gear calc
         if((GPIO.input(gear_pin1) == 0) and (GPIO.input(gear_pin2) == 1)):
