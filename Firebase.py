@@ -263,10 +263,12 @@ def parametersCalculation():
         
          # headlight in calc
         if(GPIO.input(headlight_in_pin) == 1):
-            if(GPIO.input(headlight_in_pin) == 0):
+            if(headlightin==0):
                 GPIO.output(headlight_out_pin, GPIO.HIGH)
             else:
                 GPIO.output(headlight_out_pin, GPIO.LOW)
+                
+        
         # left-out calc
         if(GPIO.input(left_in_pin) == 0):
             GPIO.output(left_out_pin, GPIO.HIGH)
