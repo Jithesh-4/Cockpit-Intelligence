@@ -108,7 +108,7 @@ print()
 
 def earCalculation():
     earCalculation.ear_val = 0
-    earCalculation.distraction = 0
+    
     while True:
         (status, image) = webcamFeed.read()
         image = imutils.resize(image, width=800)
@@ -116,12 +116,6 @@ def earCalculation():
 
         faces = faceDetector(grayImage, 0)
 
-        if len(faces) == 0:
-            earCalculation.distraction = 1
-            dis =  "detected"
-        else:
-            earCalculation.distraction = 0
-            dis =  "not detected"
 
         for face in faces:
             faceLandmarks = landmarkFinder(grayImage, face)
@@ -148,7 +142,7 @@ def earCalculation():
                 EYE_CLOSED_COUNTER = 0
 
             cv2.putText(image, "EAR: {}".format(round(ear, 1)), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-            cv2.putText(image, "Distraction: {}".str(dis), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            #cv2.putText(image, "Distraction: {}".str(dis), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
             if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
                 cv2.putText(image, "Drowsiness", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
@@ -277,20 +271,27 @@ def parametersCalculation():
         if(GPIO.input(left_in_pin) == 1):
             if(left_in==0):
                 GPIO.output(left_out_pin, GPIO.HIGH)
-        else:
-            GPIO.output(left_out_pin, GPIO.LOW)
+            else:
+                GPIO.output(left_out_pin, GPIO.LOW)
 
 
         # right-out calc
         if(GPIO.input(right_in_pin) == 1):
             if(right_in==0):
-                GPIO.output(right_in_pin, GPIO.HIGH)
+                GPIO.output(right_out_pin, GPIO.HIGH)
+            else:
+                GPIO.output(right_out_pin, GPIO.LOW)
+            
+        # distraction calc
+        if earCalculation.ear_val is None:
+                distraction = 1
         else:
-            GPIO.output(right_in_pin, GPIO.LOW)
-
+                distraction = 0
+        
+                
         data={
       "ear":earCalculation.ear_val,
-      "distraction":earCalculation.distraction,
+      "distraction":distraction,
       "acceleration":acc,
       "brake":brake,
       "seatbelt":seatbelt,
