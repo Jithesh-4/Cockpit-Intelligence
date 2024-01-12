@@ -188,8 +188,10 @@ def parametersCalculation():
         # seatbelt calc
         if(GPIO.input(seatbelt_pin) == 0):
             seatbelt = 1
+            GPIO.output(beep_out_pin, GPIO.HIGH)
         elif(GPIO.input(seatbelt_pin) == 1):
             seatbelt = 0
+            GPIO.output(beep_out_pin, GPIO.LOW)
 
         # steering calc
         if(GPIO.input(steering_pin) == 1):
@@ -251,13 +253,7 @@ def parametersCalculation():
             horn = 1
         elif(GPIO.input(horn_pin) == 0):
             horn = 0
-        
-        # beep out
-        if(GPIO.input(horn_pin) == 1):
-            GPIO.output(beep_out_pin, GPIO.HIGH)
-        elif(GPIO.input(horn_pin) == 0):
-            GPIO.output(beep_out_pin, GPIO.LOW)
-        
+            
         
          # headlight out calc
         if(GPIO.input(headlight_in_pin) == 1):
@@ -281,17 +277,10 @@ def parametersCalculation():
                 GPIO.output(right_out_pin, GPIO.HIGH)
             else:
                 GPIO.output(right_out_pin, GPIO.LOW)
-            
-        # distraction calc
-        if earCalculation.ear_val is None:
-                distraction = 1
-        else:
-                distraction = 0
         
                 
         data={
       "ear":earCalculation.ear_val,
-      "distraction":distraction,
       "acceleration":acc,
       "brake":brake,
       "seatbelt":seatbelt,
