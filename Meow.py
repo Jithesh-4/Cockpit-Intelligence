@@ -108,12 +108,14 @@ print()
 
 def earCalculation():
     earCalculation.ear_val = 0
+    
     while True:
         (status, image) = webcamFeed.read()
         image = imutils.resize(image, width=800)
         grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         faces = faceDetector(grayImage, 0)
+
 
         for face in faces:
             faceLandmarks = landmarkFinder(grayImage, face)
@@ -139,10 +141,11 @@ def earCalculation():
             else:
                 EYE_CLOSED_COUNTER = 0
 
-            cv2.putText(image, "EAR: {}".format(round(ear, 1)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(image, "EAR: {}".format(round(ear, 1)), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            #cv2.putText(image, "Distraction: {}".str(dis), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
             if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
-                cv2.putText(image, "Drowsiness", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(image, "Drowsiness", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         cv2.imshow("Frame", image)
         cv2.waitKey(1)
@@ -196,16 +199,26 @@ def parametersCalculation():
 
         # left-in calc
         if(GPIO.input(left_in_pin) == 1):
-            left_in = ~left_in
+            if(left_in==0):
+                left_in=1
+            else:
+                left_in=0
 
         # right-in calc
         if(GPIO.input(right_in_pin) == 1):
-            right_in = ~right_in
+            if(right_in==0):
+                right_in=1
+            else:
+                right_in=0
 
         # headlight in calc
         if(GPIO.input(headlight_in_pin) == 1):
-            headlightin = ~headlightin
+            if(headlightin==0):
+                headlightin=1
+            else:
+                headlightin=0
 
+                
         # gear calc
         if((GPIO.input(gear_pin1) == 0) and (GPIO.input(gear_pin2) == 1)):
             time.sleep(.250)
@@ -239,33 +252,72 @@ def parametersCalculation():
         elif(GPIO.input(horn_pin) == 0):
             horn = 0
         
-        # beep out
-        if(GPIO.input(horn_pin) == 1):
-            GPIO.output(beep_out_pin, GPIO.HIGH)
-        elif(GPIO.input(horn_pin) == 0):
-            GPIO.output(beep_out_pin, GPIO.LOW)
         
-        # headlight out
-        if(GPIO.input(headlight_in_pin) == 0):
-            GPIO.output(headlight_out_pin, GPIO.HIGH)
-        elif(GPIO.input(headlight_in_pin) == 1):
-            GPIO.output(headlight_out_pin, GPIO.LOW)
+        
+         # headlight out calc
+        if(GPIO.input(headlight_in_pin) == 1):
+            if(headlightin==0):
+                GPIO.output(headlight_out_pin, GPIO.HIGH)
+            else:
+                GPIO.output(headlight_out_pin, GPIO.LOW)
+                
         
         # left-out calc
-        if(GPIO.input(left_in_pin) == 0):
-            GPIO.output(left_out_pin, GPIO.HIGH)
-        elif(GPIO.input(left_in_pin) == 1):
-            GPIO.output(left_out_pin, GPIO.LOW)
+        if(GPIO.input(left_in_pin) == 1):
+            if(left_in==0):
+                GPIO.output(left_out_pin, GPIO.HIGH)
+            else:
+                GPIO.output(left_out_pin, GPIO.LOW)
+
 
         # right-out calc
-        if(GPIO.input(right_in_pin) == 0):
-            GPIO.output(right_out_pin, GPIO.HIGH)
-        elif(GPIO.input(right_in_pin) == 1):
-            GPIO.output(right_out_pin, GPIO.LOW)
+        if(GPIO.input(right_in_pin) == 1):
+            if(right_in==0):
+                GPIO.output(right_out_pin, GPIO.HIGH)
+            else:
+                GPIO.output(right_out_pin, GPIO.LOW)
+            
+        # distraction calc
+def earCalculation():
+    while True:
+        (status, image) = webcamFeed.read()
+        image = imutils.resize(image, width=800)
+        grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+        faces = faceDetector(grayImage, 0)
+        eyes_detected = False  # Flag to indicate eye detection
 
+        for face in faces:
+            faceLandmarks = landmarkFinder(grayImage, face)
+            faceLandmarks = face_utils.shape_to_np(faceLandmarks)
+
+            leftEye = faceLandmarks[leftEyeStart:leftEyeEnd]
+            rightEye = faceLandmarks[rightEyeStart:rightEyeEnd]
+
+            leftEAR = eye_aspect_ratio(leftEye)
+            rightEAR = eye_aspect_ratio(rightEye)
+
+            ear = (leftEAR + rightEAR) / 2.0
+
+            if ear < MINIMUM_EAR:
+                EYE_CLOSED_COUNTER += 1
+            else:
+                EYE_CLOSED_COUNTER = 0
+
+            if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
+                cv2.putText(image, "Drowsiness", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+            eyes_detected = True  # Eyes detected
+
+        cv2.imshow("Frame", image)
+        cv2.waitKey(1)
+
+        earCalculation.ear_val = ear if eyes_detected else None  # Set ear value or None if no eyes detected
+        
+                
         data={
       "ear":earCalculation.ear_val,
+      "distraction":distraction,
       "acceleration":acc,
       "brake":brake,
       "seatbelt":seatbelt,
@@ -279,7 +331,7 @@ def parametersCalculation():
       "horn":horn
         }
         print(data)
-        ref.set(data)
+        ref.child("rpi_sensors").set(data)
 
 
 if __name__ == '__main__':
