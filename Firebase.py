@@ -98,7 +98,7 @@ EYE_CLOSED_COUNTER = 0
 
 cred = credentials.Certificate("/home/pi/Desktop/Cockpit-Intelligence/cockpit-intelligence-firebase-adminsdk-a7ryd-7da4f325ef.json")
 firebase_app = initialize_app(cred, {"databaseURL": "https://cockpit-intelligence-default-rtdb.firebaseio.com/"})
-ref = db.reference("/")
+ref = db.reference("/sensor-values")
 
 
 print("Send Data to Firebase Using Raspberry Pi")
