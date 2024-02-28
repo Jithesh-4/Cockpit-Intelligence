@@ -301,6 +301,7 @@ def parametersCalculation():
         }
         print(data)
         db.child("rpi_sensors").set(data)
+        #time.sleep(1)
 
 
 if __name__ == '__main__':
